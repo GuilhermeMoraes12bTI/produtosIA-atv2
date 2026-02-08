@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Produtos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">Sistema Estoque</div>
+        <div class="menu-items">
+            <button onclick="app.navigate('home')" class="nav-btn active">Inicio</button>
+            <button onclick="app.navigate('create')" class="nav-btn">Cadastrar</button>
+            <button onclick="app.loadList()" class="nav-btn">Lista</button>
+            
+            <button onclick="app.toggleTheme()" class="theme-btn" id="theme-btn">Mudar Tema</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="toast" class="toast hidden"></div>
+
+        <section id="home" class="view active">
+            <div class="hero">
+                <h1>Sistema Estoque</h1>
+                <h2 class="slogan">Eficiencia e controle absoluto para o seu negocio.</h2>
+                <p>Gerencie seus produtos, categorias e precos em um so lugar.</p>
+                <button onclick="app.navigate('create')" class="btn btn-primary" style="margin-top: 20px;">Comecar Agora</button>
+            </div>
+        </section>
+
+        <section id="create" class="view hidden">
+            <div class="card">
+                <h2>Novo Produto</h2>
+                <form id="form-create">
+                    <div class="input-group">
+                        <label for="name">Nome do Produto</label>
+                        <input type="text" id="name" placeholder="Ex: Racao Premium" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="price">Preco (R$)</label>
+                            <input type="number" id="price" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="category">Categoria</label>
+                            <select id="category">
+                                <option value="Eletronicos">Eletronicos</option>
+                                <option value="Roupas">Roupas</option>
+                                <option value="Beleza">Beleza</option>
+                                <option value="Alimentos">Alimentos</option>
+                                <option value="Pets">Pets</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="description">Descricao (Opcional)</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button type="button" onclick="app.clearForm()" class="btn btn-outline">Limpar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="list" class="view hidden">
+            <div class="header-list">
+                <h2>Produtos Cadastrados</h2>
+                <button onclick="app.loadList()" class="btn btn-sm">Atualizar Lista</button>
+            </div>
+            
+            <div id="loading" class="hidden text-center">Carregando dados...</div>
+            
+            <div id="grid-products" class="grid">
+                </div>
+            
+            <div id="empty-state" class="hidden text-center">
+                <p>Nenhum produto encontrado no banco de dados.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

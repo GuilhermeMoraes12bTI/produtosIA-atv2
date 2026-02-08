@@ -1,0 +1,17 @@
+# Dependências (Pesado demais, não enviar)
+node_modules/
+
+# Arquivos de Sistema (Lixo do Windows/Mac)
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log
+*.log
+
+# Segurança (CRÍTICO: Nunca enviar senhas)
+.env
+
+# Configurações do Editor (Opcional, mas recomendado)
+.vscode/
+.idea/
