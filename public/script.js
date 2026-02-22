@@ -174,15 +174,17 @@ const app = {
             });
 
             if (response.ok) {
-                app.showToast('Produto excluído!', 'success');
+                // Mensagem de sucesso usando alert, conforme solicitado
+                alert('Produto excluído com sucesso!'); 
+                
                 // Recarrega a lista para o item sumir da tela
                 app.loadList();
             } else {
-                app.showToast('Erro ao excluir.', 'error');
+                alert('Erro ao excluir o produto.');
             }
         } catch (error) {
             console.error(error);
-            app.showToast('Erro de conexão.', 'error');
+            alert('Erro de conexão ao tentar excluir.');
         }
     },
 
