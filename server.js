@@ -90,6 +90,49 @@ app.post('/api/products', (req, res) => {
 });
 
     // ... (mantenha os códigos anteriores de conexão e rotas GET/POST)
+    // Rota 3: Buscar APENAS UM Produto por ID (GET) - Usada para preencher o formulário
+app.get('/api/products/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = 'SELECT * FROM productsGuilherme WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erro ao buscar o produto.' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Produto não encontrado.' });
+        }
+        res.json(results[0]); // Retorna apenas o objeto do produto
+    });
+});
+
+// Rota 4: Atualizar Produto (PUT)
+app.put('/api/products/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, price, category, description } = req.body;
+
+    if (!name || !price) {
+        return res.status(400).json({ message: 'Nome e preço são obrigatórios.' });
+    }
+
+    const sql = 'UPDATE productsGuilherme SET name=?, price=?, category=?, description=? WHERE id=?';
+    const descValue = description || null;
+
+    db.query(sql, [name, price, category, descValue, id], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erro ao atualizar no banco de dados.' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Produto não encontrado para atualização.' });
+        }
+
+        res.json({ message: 'Produto atualizado com sucesso!' });
+    });
+});
+
 
 // NOVA ROTA: Excluir Produto (DELETE)
 app.delete('/api/products/:id', (req, res) => {

@@ -10,14 +10,20 @@ const app = {
             document.body.classList.add('dark-mode');
         }
 
-        // Adiciona o evento de envio ao formulário
-        const form = document.getElementById('form-create');
-        if (form) {
-            form.addEventListener('submit', app.createProduct);
+        // Adiciona o evento de envio ao formulário de cadastro
+        const formCreate = document.getElementById('form-create');
+        if (formCreate) {
+            formCreate.addEventListener('submit', app.createProduct);
+        }
+
+        // Adiciona o evento de envio ao formulário de edição (NOVO)
+        const formEdit = document.getElementById('form-edit');
+        if (formEdit) {
+            formEdit.addEventListener('submit', app.submitEdit);
         }
     },
 
-    // 2. Navegação entre Abas (Home, Cadastrar, Lista)
+    // 2. Navegação entre Abas (Home, Cadastrar, Lista, Editar)
     navigate: (viewId) => {
         // Esconde todas as seções
         document.querySelectorAll('.view').forEach(el => el.classList.remove('active', 'hidden'));
@@ -32,7 +38,7 @@ const app = {
         // Atualiza a cor dos botões do menu
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         
-        // Ativa o botão correto baseado na tela
+        // Ativa o botão correto baseado na tela (Aba Editar não precisa de botão ativo no menu)
         if(viewId === 'home') document.querySelectorAll('.nav-btn')[0].classList.add('active');
         if(viewId === 'create') document.querySelectorAll('.nav-btn')[1].classList.add('active');
         if(viewId === 'list') document.querySelectorAll('.nav-btn')[2].classList.add('active');
@@ -147,9 +153,14 @@ const app = {
                         ${prod.description || 'Sem descrição'}
                     </p>
                     
-                    <button onclick="app.deleteProduct(${prod.id})" class="btn-danger">
-                        Excluir
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="app.loadEdit(${prod.id})" class="btn-edit">
+                            Editar
+                        </button>
+                        <button onclick="app.deleteProduct(${prod.id})" class="btn-danger">
+                            Excluir
+                        </button>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
@@ -191,6 +202,73 @@ const app = {
     // 8. Limpar Formulário
     clearForm: () => {
         document.getElementById('form-create').reset();
+    },
+
+    // 9. Carregar dados do produto para Edição (NOVO)
+    loadEdit: async (id) => {
+        try {
+            const response = await fetch(`${app.apiUrl}/${id}`);
+            
+            if (!response.ok) throw new Error('Erro ao buscar o produto');
+            
+            const product = await response.json();
+
+            // Preenche o formulário com os dados recebidos do backend
+            document.getElementById('edit-id').value = product.id;
+            document.getElementById('edit-name').value = product.name;
+            document.getElementById('edit-price').value = product.price;
+            document.getElementById('edit-category').value = product.category;
+            document.getElementById('edit-description').value = product.description || '';
+
+            // Navega para a aba de edição
+            app.navigate('edit');
+        } catch (error) {
+            console.error(error);
+            app.showToast('Erro ao carregar os dados do produto', 'error'); 
+        }
+    },
+
+    // 10. Atualizar Produto (PUT) (NOVO)
+    submitEdit: async (e) => {
+        e.preventDefault();
+        
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        
+        // Feedback visual
+        btn.textContent = 'Atualizando...';
+        btn.disabled = true;
+
+        const id = document.getElementById('edit-id').value;
+        const data = {
+            name: document.getElementById('edit-name').value,
+            price: document.getElementById('edit-price').value,
+            category: document.getElementById('edit-category').value,
+            description: document.getElementById('edit-description').value
+        };
+
+        try {
+            const response = await fetch(`${app.apiUrl}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                app.showToast('Produto atualizado com sucesso!', 'success');
+                // Recarrega a lista e volta para a tela da lista
+                app.loadList(); 
+            } else {
+                app.showToast('Erro ao atualizar produto.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            app.showToast('Erro de conexão com o servidor.', 'error');
+        } finally {
+            // Restaura o botão
+            btn.textContent = originalText;
+            btn.disabled = false;
+        }
     }
 };
 
